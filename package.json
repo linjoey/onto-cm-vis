@@ -1,0 +1,22 @@
+{
+  "name": "onto-cm-vis",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://linjoey@github.com/linjoey/onto-cm-vis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/linjoey/onto-cm-vis/issues"
+  },
+  "homepage": "https://github.com/linjoey/onto-cm-vis#readme",
+  "dependencies": {
+    "d3": "^3.5.13"
+  }
+}
