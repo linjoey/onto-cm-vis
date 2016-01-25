@@ -15,6 +15,7 @@
         }
 
         .node text {
+            cursor: pointer;
             font-size: 11px;
         }
 
@@ -44,6 +45,17 @@
         diameter: 850,
         keyFn: function(d) {
             return d.id
+        },
+        labelFn: function(d) {
+            var prefix = 'Abnormality of '
+            if (d.name.slice(0, prefix.length) == prefix) {
+                var n = d.name.slice(prefix.length, d.name.length)
+                return n.charAt(0).toUpperCase() + n.slice(1)
+            }
+            return d.name;
+        },
+        tclosure: function(d) {
+            return d.TotalChildren
         }
     })
 
