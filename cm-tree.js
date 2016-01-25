@@ -2,7 +2,7 @@
 
 (function(){
 
-  var _CMTREE = function(options) {
+  function _CMTREE (options) {
     this._opts = options;
 
     this.tree = d3.layout.tree()
@@ -25,9 +25,18 @@
     }
   }
 
-  function toggleAll(d) {
+  _CMTREE.prototype.initData = function(d) {
+    var self = this
+
     if (d.children) {
-      d.children.forEach(toggleAll);
+      d.children.sort(function(a,b) {
+        //console.log(self)
+        return self._opts.tclosure(a) - self._opts.tclosure(b)
+      })
+
+      d.children.forEach(function(d){
+        self.initData.call(self, d)
+      });
       toggle(d);
     }
   }
@@ -42,18 +51,21 @@
       .attr("transform", "translate(" + self._opts.diameter / 2 + "," + self._opts.diameter / 2 + ")");
 
     d3.json(self._opts.dataFile, function (e, root){
-      self.data = root
-      root.children.forEach(toggleAll)
+      self.data = root;
+
+      self.initData(root)
 
       self.nodeColorScale = d3.scale.linear()
+        //TODO remove hardcode
         //.domain([0, self._opts.tclosure(root)])
         .domain([0, 3517])
         .range(['white', 'black'])
 
       update.call(self, root);
 
+    });
 
-    })
+    self.initData()
   };
 
   function update(source) {
@@ -95,16 +107,19 @@
       .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
       .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
       .text(function(d){
-        if (self._opts.labelFn) {
-          return self._opts.labelFn(d)
-        } else {
-          return d.name
+
+        if (d.id !== self.data.id) {
+          if (self._opts.labelFn) {
+            return self._opts.labelFn(d)
+          } else {
+            return d.name
+          }
+
         }
       })
       .on('click', drillNode);
 
     n.exit().remove()
-
 
     var dataLinks = self.tree.links(dataNodes)
 
