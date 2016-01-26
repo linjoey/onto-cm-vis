@@ -17,6 +17,7 @@
   };
 
   function toggle(d) {
+    d.expanded = !d.expanded;
     if (d.children) {
       d._children = d.children;
       d.children = null;
@@ -27,7 +28,10 @@
   }
 
   _CMTREE.prototype.initData = function(d) {
+
+    if (d === undefined) { return }
     var self = this;
+    d['expanded'] = true;
 
     if (d && d.children) {
       d.children.sort(function(a,b) {
@@ -59,7 +63,7 @@
         //TODO remove hardcode
         //.domain([0, self._opts.tclosure(root)])
         .domain([0, 3517])
-        .range(['white', 'black'])
+        .range(['white', 'steelblue'])
 
       update.call(self, root);
 
@@ -80,7 +84,9 @@
       return "rotate(" + ((d.x || 0) - 90) + ")translate(" + d.y  + ")";
     }
 
-    function drillNode(d){
+    function drillNode(d) {
+
+      console.log(d)
 
       if (d.id == self.data.id) {
         self.initData(d)
@@ -88,6 +94,10 @@
 
       toggle(d);
       update.call(self, d)
+
+      d3.select("[targetid='"+ d.id+"']").style('stroke', function(d) { return d.target.expanded ? 'red' : '#ccc'})
+        .style('opacity', '0.5')
+
     }
 
     n.transition().duration(500).attr("transform", transformNode)
@@ -103,7 +113,7 @@
       .attr('r', function(d){
         return self._opts.tclosure(d) > 0 ? 4.5 : 1
       })
-      .style('fill', function(d){
+      .style('fill', function(d) {
         return self.nodeColorScale(self._opts.tclosure(d))
       })
       .on('click', drillNode);
@@ -125,7 +135,7 @@
       })
       .on('click', drillNode);
 
-    n.exit().remove()
+    n.exit().remove();
 
     var dataLinks = self.tree.links(dataNodes)
 
@@ -145,6 +155,9 @@
       })
       .transition()
       .duration(500)
+      .attr('targetid', function(d){
+        return d.target.id
+      })
       .attr("d", self.diagonal);
 
     l.exit().transition()
