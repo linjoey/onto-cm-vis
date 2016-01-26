@@ -7,7 +7,8 @@
 
     this.tree = d3.layout.tree()
       .size([360, this._opts.diameter / 2 - 120])
-      .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
+      .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; })
+
 
     this.diagonal = d3.svg.diagonal.radial()
       .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
@@ -26,20 +27,19 @@
   }
 
   _CMTREE.prototype.initData = function(d) {
-    var self = this
+    var self = this;
 
-    if (d.children) {
+    if (d && d.children) {
       d.children.sort(function(a,b) {
-        //console.log(self)
-        return self._opts.tclosure(a) - self._opts.tclosure(b)
-      })
+        return self._opts.tclosure(b) - self._opts.tclosure(a)
+      });
 
       d.children.forEach(function(d){
         self.initData.call(self, d)
       });
       toggle(d);
     }
-  }
+  };
 
   _CMTREE.prototype.draw = function() {
     var self = this;
@@ -81,7 +81,11 @@
     }
 
     function drillNode(d){
-      console.log(d)
+
+      if (d.id == self.data.id) {
+        self.initData(d)
+      }
+
       toggle(d);
       update.call(self, d)
     }
@@ -96,7 +100,9 @@
 
 
     ne.append('circle')
-      .attr('r', 4.5)
+      .attr('r', function(d){
+        return self._opts.tclosure(d) > 0 ? 4.5 : 1
+      })
       .style('fill', function(d){
         return self.nodeColorScale(self._opts.tclosure(d))
       })
