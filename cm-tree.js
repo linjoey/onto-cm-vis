@@ -35,7 +35,7 @@
 
     if (d && d.children) {
       d.children.sort(function(a,b) {
-        return self._opts.tclosure(b) - self._opts.tclosure(a)
+        return b[self._opts.tclosure] - a[self._opts.tclosure]
       });
 
       d.children.forEach(function(d){
@@ -76,17 +76,32 @@
 
     var self = this;
 
+    if (source.children && source.children.length > 8) {
+      var fh = source.children.slice(0, 8)
+      var sh = source.children.slice(8, source.children.length)
+
+      var an = {
+        name: '[...](' + sh.length + ')',
+        _children: sh,
+        children: null,
+        expanded: false,
+        id: source.id + 'rem'
+      };
+
+
+      fh.push(an);
+      source.children = fh
+    }
+
     var dataNodes = self.tree.nodes(self.data)
 
-    var n = self.svg.selectAll('g.node').data(dataNodes, self._opts.keyFn)
+    var n = self.svg.selectAll('g.node').data(dataNodes, self._opts.keyFn);
 
     function transformNode(d) {
       return "rotate(" + ((d.x || 0) - 90) + ")translate(" + d.y  + ")";
     }
 
     function drillNode(d) {
-
-      console.log(d)
 
       if (d.id == self.data.id) {
         self.initData(d)
@@ -100,7 +115,7 @@
 
     }
 
-    n.transition().duration(500).attr("transform", transformNode)
+    n.transition().duration(500).attr("transform", transformNode);
 
     ne = n.enter()
       .append('g')
@@ -111,10 +126,10 @@
 
     ne.append('circle')
       .attr('r', function(d){
-        return self._opts.tclosure(d) > 0 ? 4.5 : 1
+        return d[self._opts.tclosure] > 0 ? 4.5 : 1
       })
       .style('fill', function(d) {
-        return self.nodeColorScale(self._opts.tclosure(d))
+        return self.nodeColorScale(d[self._opts.tclosure])
       })
       .on('click', drillNode);
 
