@@ -107,6 +107,11 @@
         self.initData(d)
       }
 
+      //if (d.name.startsWith('[...]')) {
+      //  console.log('blah')
+      //  console.log(d.expanded)
+      //}
+
       toggle(d);
       update.call(self, d)
 

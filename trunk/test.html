@@ -7,21 +7,43 @@
 </head>
 <body>
 
+<svg>
+
+
+    <rect y = 30 id="a1" width="20" height="20"></rect>
+    <rect y = 60 id="a2" width="20" height="20"></rect>
+    <rect y = 90 id="a3" width="20" height="20"></rect>
+    <rect y = 120 id="a4" width="20" height="20"></rect>
+    <rect y = 0 id="a5" width="20" height="20"></rect>
+</svg>
+<script src="../node_modules/d3/d3.min.js"></script>
 
 <script>
-    console.log('hi')
 
-    a = {
-        x: 10
-    }
+    s = d3.scale.linear()
+            .domain([0, 11000])
+            .range(['white', 'steelblue'])
 
-    b = []
-    b.push(a)
+    console.log(s(200))
 
-    console.log(JSON.parse(JSON.stringify(b)));
-    b[0].x = 20
+
+
+
+    var c = d3.rgb('#708EA4')
+
+    var v1 = d3.select('#a1')
+            .style('fill', s(0))
+    var v2 = d3.select('#a2')
+            .style('fill', s(100))
+    var v3 = d3.select('#a3')
+            .style('fill', s(5000))
+    var v4 = d3.select('#a4')
+            .style('fill', s(10000))
+
+
 
 
 </script>
+
 </body>
 </html>
