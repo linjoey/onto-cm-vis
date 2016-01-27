@@ -13,6 +13,11 @@
     this.diagonal = d3.svg.diagonal.radial()
       .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
+    this.tooltip = d3.tip().attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html(function(d){
+        return d.name
+      })
 
   };
 
@@ -54,6 +59,8 @@
       .append('g')
       .attr("transform", "translate(" + self._opts.diameter / 2 + "," + self._opts.diameter / 2 + ")");
 
+    self.svg.call(self.tooltip)
+
     d3.json(self._opts.dataFile, function (e, root){
       self.data = root;
 
@@ -68,8 +75,6 @@
       update.call(self, root);
 
     });
-
-    self.initData()
   };
 
   function update(source) {
@@ -107,16 +112,16 @@
         self.initData(d)
       }
 
-      //if (d.name.startsWith('[...]')) {
-      //  console.log('blah')
-      //  console.log(d.expanded)
-      //}
-
       toggle(d);
       update.call(self, d)
 
       d3.select("[targetid='"+ d.id+"']").style('stroke', function(d) { return d.target.expanded ? 'red' : '#ccc'})
         .style('opacity', '0.5')
+
+      console.log(d)
+      if (d.parent) {
+        d.parent
+      }
 
     }
 
@@ -131,12 +136,14 @@
 
     ne.append('circle')
       .attr('r', function(d){
-        return d[self._opts.tclosure] > 0 ? 4.5 : 1
+        return d[self._opts.tclosure] > 0 ? 6 : 1
       })
       .style('fill', function(d) {
         return self.nodeColorScale(d[self._opts.tclosure])
       })
-      .on('click', drillNode);
+      .on('click', drillNode)
+      .on('mouseover', self.tooltip.show)
+      .on('mouseout', self.tooltip.hide)
 
     ne.append("text")
       .attr("dy", ".31em")

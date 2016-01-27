@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/linjoey/onto-cm-vis#readme",
   "dependencies": {
-    "d3": "^3.5.13"
+    "d3": "^3.5.13",
+    "d3-tip": "^0.6.7"
   }
 }

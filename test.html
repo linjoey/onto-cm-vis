@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="stylesheet" href="//rawgithub.com/Caged/d3-tip/master/examples/example-styles.css">
+
+    <style type="text/css">
+
+
+        .node circle {
+            cursor: pointer;
+            fill: #fff;
+            stroke: steelblue;
+            stroke-width: 1.5px;
+        }
+
+        .node text {
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        path.link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 1.5px;
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div id="my-div"></div>
+
+<script src="node_modules/d3/d3.min.js" charset="utf-8"></script>
+<script src="node_modules/d3-tip/index.js"></script>
+
+<script src="cm-tree.js"></script>
+<script>
+
+
+
+    cm = new CMTree({
+        targetID: '#my-div',
+        dataFile: 'hpo.json',
+        diameter: 700,
+        keyFn: function(d) {
+            return d.id
+        },
+        labelFn: function(d) {
+            var prefix = 'Abnormality of ';
+            if (d.name.slice(0, prefix.length) == prefix) {
+                var n = d.name.slice(prefix.length, d.name.length)
+                return n.charAt(0).toUpperCase() + n.slice(1)
+            }
+            return d.name;
+        },
+        tclosure: 'TotalChildren'
+    });
+
+    cm.draw()
+
+    console.log(d3.tip)
+
+
+
+</script>
+
+</body>
+</html>
