@@ -19,6 +19,8 @@
         return d.name
       })
 
+
+
   };
 
   function toggle(d) {
@@ -107,7 +109,29 @@
       return "rotate(" + ((d.x || 0) - 90) + ")translate(" + d.y  + ")";
     }
 
+    function unclutterText(src, reverse) {
+
+      if (src.parent) {
+        
+        var p = src.parent
+
+        var nhide = p.children.filter(function(v) {
+          return v.id !== src.id
+        });
+        var selNodes = d3.selectAll('g.node').data(nhide, self._opts.keyFn)
+          .select('text')
+
+        if(!reverse) {
+          selNodes.style('visibility', 'hidden')
+        } else {
+          selNodes.style('visibility', 'visible')
+        }
+      }
+    }
+
     function drillNode(d) {
+
+      //console.log(d)
 
       if (d.id == self.data.id) {
         self.initData(d)
@@ -119,14 +143,24 @@
       d3.select("[targetid='"+ d.id+"']").style('stroke', function(d) { return d.target.expanded ? 'red' : '#ccc'})
         .style('opacity', '0.5')
 
+      if (d.depth > 1) {
+        if(d.expanded) {
+          unclutterText(d, false)
+          unclutterText(d.parent, false)
+        } else {
+          console.log('show')
+          unclutterText(d, true)
+        }
+      } else {
+        unclutterText(d, true)
+      }
     }
-    
+
     n.transition().duration(500).attr("transform", transformNode);
 
-    ne = n.enter()
+    var ne = n.enter()
       .append('g')
       .attr('class', 'node')
-      .attr('text', function(d) { return d.name})
       .attr("transform", transformNode)
 
 
