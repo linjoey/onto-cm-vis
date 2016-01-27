@@ -77,13 +77,15 @@
     });
   };
 
+  //source is the node clicked
   function update(source) {
 
     var self = this;
 
+    //only show 8
     if (source.children && source.children.length > 8) {
-      var fh = source.children.slice(0, 8)
-      var sh = source.children.slice(8, source.children.length)
+      var fh = source.children.slice(0, 8);
+      var sh = source.children.slice(8, source.children.length);
 
       var an = {
         name: '[...](' + sh.length + ')',
@@ -92,7 +94,6 @@
         expanded: false,
         id: source.id + 'rem'
       };
-
 
       fh.push(an);
       source.children = fh
@@ -118,13 +119,8 @@
       d3.select("[targetid='"+ d.id+"']").style('stroke', function(d) { return d.target.expanded ? 'red' : '#ccc'})
         .style('opacity', '0.5')
 
-      console.log(d)
-      if (d.parent) {
-        d.parent
-      }
-
     }
-
+    
     n.transition().duration(500).attr("transform", transformNode);
 
     ne = n.enter()
