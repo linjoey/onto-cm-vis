@@ -20,18 +20,6 @@
       })
   };
 
-  function toggle(d) {
-    if (d.children) {
-      d.expanded = false;
-      d._children = d.children;
-      d.children = null;
-    } else {
-      d.expanded = true;
-      d.children = d._children;
-      d._children = null;
-    }
-  }
-
   _CMTREE.prototype.initData = function(d) {
 
     if (d === undefined) { return }
@@ -77,6 +65,19 @@
 
     });
   };
+
+  function toggle(d) {
+    if (d.children && !d.arti) {
+      d.expanded = false;
+      d._children = d.children;
+      d.children = null;
+    } else {
+      d.arti = false;
+      d.expanded = true;
+      d.children = d._children;
+      d._children = null;
+    }
+  }
 
   //source is the node clicked
   function update(source) {
@@ -136,7 +137,17 @@
         self.initData(d)
       }
 
-      if (d.depth >= 4) {
+      //create artificial node
+      if (d.depth == 4 && !d.expanded) {
+        var dp = d.parent
+
+        toggle(dp);
+        dp.arti = true
+        dp.children = [d]
+        d.artiref = dp
+      }
+
+      if (d.depth > 4) {
 
       }
 
@@ -160,6 +171,29 @@
     }
 
     n.transition().duration(500).attr("transform", transformNode);
+    n.select('circle')
+      .style('fill', function(d) {
+        if (d.arti) {
+          return 'red'
+        }
+        return self.nodeColorScale(d[self._opts.tclosure])
+      })
+
+    n.select('text').text(function(d){
+
+      if (d.arti) {
+        return ''
+      }
+
+      if (d.id !== self.data.id) {
+        if (self._opts.labelFn) {
+          return self._opts.labelFn(d)
+        } else {
+          return d.name
+        }
+
+      }
+    });
 
     var ne = n.enter()
       .append('g')
@@ -172,6 +206,9 @@
         return d[self._opts.tclosure] > 0 ? 6 : 1
       })
       .style('fill', function(d) {
+        if (d.arti) {
+          return 'red'
+        }
         return self.nodeColorScale(d[self._opts.tclosure])
       })
       .on('click', drillNode)
