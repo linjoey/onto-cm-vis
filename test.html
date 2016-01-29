@@ -5,6 +5,7 @@
     <title>Title</title>
 
     <link rel="stylesheet" href="d3-tip-style.css">
+    <link rel="stylesheet" href="treemap-vis/treemapvis.css">
 
     <style type="text/css">
 
@@ -27,19 +28,38 @@
             stroke-width: 1.5px;
         }
 
+        #treemap-div{
+            float:left;
+            width: 40%;
+        }
+
+        #my-div {
+            float:right;
+            width: 60%;
+        }
+
+        #container {
+            border: 1px solid black;
+            height: 700px;
+        }
+
     </style>
 </head>
 <body>
+<div id="container">
+    <div id="treemap-div"></div>
+    <div id="my-div"></div>
+</div>
 
-
-<div id="my-div"></div>
 
 <script src="node_modules/d3/d3.min.js" charset="utf-8"></script>
 <script src="node_modules/d3-tip/index.js"></script>
+<script src="treemap-vis/treemap.js"></script>
 
 <script src="cm-tree.js"></script>
 <script>
 
+    treemapvis('#treemap-div')
 
 
     cm = new CMTree({

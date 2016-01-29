@@ -38,6 +38,7 @@
     }
   };
 
+
   _CMTREE.prototype.draw = function() {
     var self = this;
     self.svg = d3.select(self._opts.targetID)
@@ -66,7 +67,8 @@
     });
   };
 
-  function toggle(d) {
+  function toggle(d
+  ) {
     if (d.children && !d.arti) {
       d.expanded = false;
       d._children = d.children;
@@ -83,6 +85,7 @@
   function update(source) {
 
     var self = this;
+    self.levelNodes = source.children
 
     //only show 8
     if (source.children && source.children.length > 8) {
@@ -133,12 +136,16 @@
 
       console.log(d)
 
+      if (d.arti) {
+        self.initData(d)
+      }
+
       if (d.id == self.data.id) {
         self.initData(d)
       }
 
       //create artificial node
-      if (d.depth == 4 && !d.expanded) {
+      if (d.depth == 4 && !d.expanded && !d.parent.arti) {
         var dp = d.parent
 
         toggle(dp);
@@ -151,9 +158,11 @@
         var artiref = d.parent.artiref
         artiref.children = [d]
         d.artiref = artiref
-
-
       }
+
+      //if (d.expanded && d.parent.arti) {
+      //  toggle(d.parent)
+      //}
 
       toggle(d);
       update.call(self, d)
@@ -273,6 +282,18 @@
       .remove();
 
   }
+
+  _CMTREE.prototype.expand = function(nodeID) {
+
+    for(var i = 0; i < self.levelNodes.length; i ++ ) {
+      if(nodeID === self.levelNodes[i].id) {
+        var n = self.levelNodes[i];
+        toggle(n);
+        update(n);
+        break;
+      }
+    }
+  };
 
   window.CMTree = _CMTREE
 })();
