@@ -18,9 +18,6 @@
       .html(function(d){
         return d.name
       })
-
-
-
   };
 
   function toggle(d) {
@@ -73,8 +70,9 @@
         //TODO remove hardcode
         //.domain([0, self._opts.tclosure(root)])
         .domain([0, 3517])
-        .range(['white', 'steelblue'])
+        .range(['white', 'steelblue']);
 
+      toggle(root)
       update.call(self, root);
 
     });
@@ -138,6 +136,10 @@
         self.initData(d)
       }
 
+      if (d.depth >= 4) {
+
+      }
+
       toggle(d);
       update.call(self, d)
 
@@ -154,6 +156,7 @@
       } else {
         unclutterText(d, true)
       }
+
     }
 
     n.transition().duration(500).attr("transform", transformNode);
@@ -190,7 +193,9 @@
 
         }
       })
-      .on('click', drillNode);
+      .on('click', drillNode)
+      .on('mouseover', self.tooltip.show)
+      .on('mouseout', self.tooltip.hide)
 
     n.exit().remove();
 
