@@ -148,6 +148,10 @@
       }
 
       if (d.depth > 4) {
+        var artiref = d.parent.artiref
+        artiref.children = [d]
+        d.artiref = artiref
+
 
       }
 
