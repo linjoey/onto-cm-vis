@@ -24,11 +24,12 @@
   };
 
   function toggle(d) {
-    d.expanded = !d.expanded;
     if (d.children) {
+      d.expanded = false;
       d._children = d.children;
       d.children = null;
     } else {
+      d.expanded = true;
       d.children = d._children;
       d._children = null;
     }
@@ -38,7 +39,7 @@
 
     if (d === undefined) { return }
     var self = this;
-    d['expanded'] = true;
+    d['expanded'] = false;
 
     if (d && d.children) {
       d.children.sort(function(a,b) {
@@ -112,7 +113,7 @@
     function unclutterText(src, reverse) {
 
       if (src.parent) {
-        
+
         var p = src.parent
 
         var nhide = p.children.filter(function(v) {
@@ -131,7 +132,7 @@
 
     function drillNode(d) {
 
-      //console.log(d)
+      console.log(d)
 
       if (d.id == self.data.id) {
         self.initData(d)
@@ -148,7 +149,6 @@
           unclutterText(d, false)
           unclutterText(d.parent, false)
         } else {
-          console.log('show')
           unclutterText(d, true)
         }
       } else {
