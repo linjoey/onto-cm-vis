@@ -130,9 +130,12 @@
       d.artiref = artiref
     }
 
-    //if (d.expanded && d.parent.arti) {
-    //  toggle(d.parent)
-    //}
+    if (d.parent && d.parent.arti && d.id == self.activeNode.id) {
+      toggle(d.parent)
+    }
+
+    console.log(d)
+    console.log(self.activeNode)
 
     toggle(d);
     update.call(self, d, bb)
@@ -164,13 +167,6 @@
     } else {
       self.activeNode = source.parent
     }
-
-
-    console.log('up, an', self.activeNode)
-
-    //if (source.parent) {
-    //  self.levelNodes.push(source.parent)
-    //}
 
 
     //only show 8
