@@ -39,7 +39,7 @@
   };
 
 
-  _CMTREE.prototype.draw = function() {
+  _CMTREE.prototype.draw = function(cb) {
     var self = this;
     self.svg = d3.select(self._opts.targetID)
       .append('svg')
@@ -63,12 +63,12 @@
 
       toggle(root)
       update.call(self, root);
-
+      //cb(self);
     });
+
   };
 
-  function toggle(d
-  ) {
+  function toggle(d) {
     if (d.children && !d.arti) {
       d.expanded = false;
       d._children = d.children;
@@ -81,11 +81,83 @@
     }
   }
 
+  function unclutterText(src, reverse) {
+    var self = this
+
+    if (src.parent) {
+
+      var p = src.parent
+
+      var nhide = p.children.filter(function(v) {
+        return v.id !== src.id
+      });
+      var selNodes = d3.selectAll('g.node').data(nhide, self._opts.keyFn)
+        .select('text')
+
+      if(!reverse) {
+        selNodes.style('visibility', 'hidden')
+      } else {
+        selNodes.style('visibility', 'visible')
+      }
+    }
+  }
+
+  function drillNode(d) {
+    var self = this;
+    console.log()
+
+    if (d.arti) {
+      self.initData(d)
+    }
+
+    if (d.id == self.data.id) {
+      self.initData(d)
+    }
+
+    //create artificial node
+    if (d.depth == 4 && !d.expanded && !d.parent.arti) {
+      var dp = d.parent
+
+      toggle(dp);
+      dp.arti = true
+      dp.children = [d]
+      d.artiref = dp
+    }
+
+    if (d.depth > 4) {
+      var artiref = d.parent.artiref
+      artiref.children = [d]
+      d.artiref = artiref
+    }
+
+    //if (d.expanded && d.parent.arti) {
+    //  toggle(d.parent)
+    //}
+
+    toggle(d);
+    update.call(self, d)
+
+    d3.select("[targetid='"+ d.id+"']").style('stroke', function(d) { return d.target.expanded ? 'red' : '#ccc'})
+      .style('opacity', '0.5')
+
+    if (d.depth > 1) {
+      if(d.expanded) {
+        unclutterText.call(self, d, false)
+        unclutterText.call(self, d.parent, false)
+      } else {
+        unclutterText.call(self, d, true)
+      }
+    } else {
+      unclutterText.call(self, d, true)
+    }
+
+  }
+
   //source is the node clicked
   function update(source) {
 
     var self = this;
-    self.levelNodes = source.children
+    self.levelNodes = source.children;
 
     //only show 8
     if (source.children && source.children.length > 8) {
@@ -112,77 +184,6 @@
       return "rotate(" + ((d.x || 0) - 90) + ")translate(" + d.y  + ")";
     }
 
-    function unclutterText(src, reverse) {
-
-      if (src.parent) {
-
-        var p = src.parent
-
-        var nhide = p.children.filter(function(v) {
-          return v.id !== src.id
-        });
-        var selNodes = d3.selectAll('g.node').data(nhide, self._opts.keyFn)
-          .select('text')
-
-        if(!reverse) {
-          selNodes.style('visibility', 'hidden')
-        } else {
-          selNodes.style('visibility', 'visible')
-        }
-      }
-    }
-
-    function drillNode(d) {
-
-      console.log(d)
-
-      if (d.arti) {
-        self.initData(d)
-      }
-
-      if (d.id == self.data.id) {
-        self.initData(d)
-      }
-
-      //create artificial node
-      if (d.depth == 4 && !d.expanded && !d.parent.arti) {
-        var dp = d.parent
-
-        toggle(dp);
-        dp.arti = true
-        dp.children = [d]
-        d.artiref = dp
-      }
-
-      if (d.depth > 4) {
-        var artiref = d.parent.artiref
-        artiref.children = [d]
-        d.artiref = artiref
-      }
-
-      //if (d.expanded && d.parent.arti) {
-      //  toggle(d.parent)
-      //}
-
-      toggle(d);
-      update.call(self, d)
-
-      d3.select("[targetid='"+ d.id+"']").style('stroke', function(d) { return d.target.expanded ? 'red' : '#ccc'})
-        .style('opacity', '0.5')
-
-      if (d.depth > 1) {
-        if(d.expanded) {
-          unclutterText(d, false)
-          unclutterText(d.parent, false)
-        } else {
-          unclutterText(d, true)
-        }
-      } else {
-        unclutterText(d, true)
-      }
-
-    }
-
     n.transition().duration(500).attr("transform", transformNode);
     n.select('circle')
       .style('fill', function(d) {
@@ -190,7 +191,7 @@
           return 'red'
         }
         return self.nodeColorScale(d[self._opts.tclosure])
-      })
+      });
 
     n.select('text').text(function(d){
 
@@ -224,7 +225,9 @@
         }
         return self.nodeColorScale(d[self._opts.tclosure])
       })
-      .on('click', drillNode)
+      .on('click', function(d){
+        drillNode.call(self, d)
+      })
       .on('mouseover', self.tooltip.show)
       .on('mouseout', self.tooltip.hide)
 
@@ -243,7 +246,9 @@
 
         }
       })
-      .on('click', drillNode)
+      .on('click', function(d){
+        drillNode.call(self, d)
+      })
       .on('mouseover', self.tooltip.show)
       .on('mouseout', self.tooltip.hide)
 
@@ -284,12 +289,14 @@
   }
 
   _CMTREE.prototype.expand = function(nodeID) {
+    var self = this;
+    console.log(self)
 
     for(var i = 0; i < self.levelNodes.length; i ++ ) {
       if(nodeID === self.levelNodes[i].id) {
         var n = self.levelNodes[i];
-        toggle(n);
-        update(n);
+        //toggle(n);
+        drillNode.call(self, n);
         break;
       }
     }

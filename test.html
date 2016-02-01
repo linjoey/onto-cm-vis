@@ -40,7 +40,7 @@
 
         #container {
             border: 1px solid black;
-            height: 700px;
+            height: 650px;
         }
 
     </style>
@@ -59,13 +59,10 @@
 <script src="cm-tree.js"></script>
 <script>
 
-    treemapvis('#treemap-div')
-
-
     cm = new CMTree({
         targetID: '#my-div',
         dataFile: 'hpo.json',
-        diameter: 700,
+        diameter: 650,
         keyFn: function(d) {
             return d.id
         },
@@ -80,7 +77,16 @@
         tclosure: 'TotalChildren'
     });
 
-    cm.draw()
+    cm.draw();
+
+    treemapvis({
+        targetID: '#treemap-div',
+        cb: (function(){
+            var e = cm.expand.bind(cm)
+            return e
+        })()
+    });
+
 
 
 </script>

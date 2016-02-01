@@ -1,0 +1,48 @@
+#treemap-div {
+    width: 500px
+}
+
+
+#treemap-div text {
+    pointer-events: none;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+
+rect {
+    fill: none;
+    stroke: #9b9dac;
+    stroke-width: 1px;
+}
+
+rect.parent,
+.grandparent rect {
+    stroke-width: 2px;
+}
+
+.grandparent rect {
+    fill: #dcdeea;
+}
+
+.grandparent:hover rect {
+    fill: #dcdeea;
+}
+
+.children rect.parent,
+.grandparent rect {
+    cursor: pointer;
+}
+
+.children rect.parent {
+    fill: #f4f2eb;
+    fill-opacity: .5;
+}
+
+.children:hover rect.child {
+    fill: #bbb;
+}
+
+.children text {
+    font-size: 13px;
+}
