@@ -103,8 +103,8 @@
   }
 
   function drillNode(d) {
+    console.log('drill',d)
     var self = this;
-    console.log()
 
     if (d.arti) {
       self.initData(d)
@@ -158,6 +158,12 @@
 
     var self = this;
     self.levelNodes = source.children;
+    self.activeNode = source;
+
+    //if (source.parent) {
+    //  self.levelNodes.push(source.parent)
+    //}
+
 
     //only show 8
     if (source.children && source.children.length > 8) {
@@ -290,16 +296,22 @@
 
   _CMTREE.prototype.expand = function(nodeID) {
     var self = this;
-    console.log(self)
 
-    for(var i = 0; i < self.levelNodes.length; i ++ ) {
-      if(nodeID === self.levelNodes[i].id) {
-        var n = self.levelNodes[i];
-        //toggle(n);
-        drillNode.call(self, n);
-        break;
+    var n;
+
+    if (self.activeNode && (nodeID == self.activeNode.id)) {
+      n = self.activeNode
+    } else {
+      for(var i = 0; i < self.activeNode.children.length; i++ ) {
+        if (nodeID === self.activeNode.children[i].id) {
+          n = self.activeNode.children[i];
+          break;
+        }
       }
     }
+
+    drillNode.call(self, n);
+
   };
 
   window.CMTree = _CMTREE

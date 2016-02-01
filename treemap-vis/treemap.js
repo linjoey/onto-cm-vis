@@ -61,7 +61,6 @@
       .attr("dy", "1em");
 
     d3.json("hpo.json", function(root) {
-      console.log(root)
       var previousParent = root;
 
       initialize(root);
@@ -130,17 +129,13 @@
             }
 
             d.children.sort(function(a,b) {
-              return b['TotalChildren'] - a['TotalChildren']
+              return a['TotalChildren'] - b['TotalChildren']
             });
 
-            console.log(d.children)
+            var midIndex = d.children.length - 8;
+            var restChildren = d.children.slice(0, midIndex);
 
-            //var midIndex = d.children.length - 7;
-            //var restChildren = d.children.slice(0, midIndex);
-            var dcopy = d.children
-
-            d._children = dcopy.slice(0, 7).reverse()
-            var restChildren = dcopy.slice(7, d.children.length);
+            d._children = d.children.slice(midIndex, d.children.length)
             previousParent = d
 
             rest.on('click', function() {
@@ -165,12 +160,16 @@
           }
         }
 
-        last = d.parent
+        //last = d.parent
+        last = d
         grandparent
-          .datum(d.parent)
-          .on("click", function(blah){
+          //.datum(d)
+          .datum(d)
+          .on("click", function(d) {
+            //console.log('grandparent', d)
             computeRest(last)
-            transition(last)
+            transition(last.parent)
+            opt.cb(d.id)
           })
           .select("text")
           .text(name(d));
@@ -190,7 +189,6 @@
           .classed("children", true)
           .on("click", function(d){
             transition(d)
-            console.log('clicky')
             opt.cb(d.id)
           });
 
@@ -269,9 +267,11 @@
       }
 
       function name(d) {
-        return d.parent
-          ? name(d.parent) + " / " + d.name
-          : d.name;
+        if(d) {
+          return ' < ' + d.name
+        } else {
+          return 'HPO'
+        }
       }
     });
   }
