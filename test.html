@@ -82,8 +82,7 @@
     treemapvis({
         targetID: '#treemap-div',
         cb: (function(){
-            var e = cm.expand.bind(cm)
-            return e
+            return cm.expand.bind(cm)
         })()
     });
 

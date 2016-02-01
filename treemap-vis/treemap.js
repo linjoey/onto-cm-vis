@@ -169,7 +169,7 @@
             //console.log('grandparent', d)
             computeRest(last)
             transition(last.parent)
-            opt.cb(d.id)
+            opt.cb(d.id, true)
           })
           .select("text")
           .text(name(d));

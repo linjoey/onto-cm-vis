@@ -102,8 +102,8 @@
     }
   }
 
-  function drillNode(d) {
-    console.log('drill',d)
+  function drillNode(d, bb) {
+    //console.log('drill',d)
     var self = this;
 
     if (d.arti) {
@@ -135,7 +135,7 @@
     //}
 
     toggle(d);
-    update.call(self, d)
+    update.call(self, d, bb)
 
     d3.select("[targetid='"+ d.id+"']").style('stroke', function(d) { return d.target.expanded ? 'red' : '#ccc'})
       .style('opacity', '0.5')
@@ -154,11 +154,19 @@
   }
 
   //source is the node clicked
-  function update(source) {
-
+  function update(source, backButton) {
+    var bb = backButton || false;
     var self = this;
     self.levelNodes = source.children;
-    self.activeNode = source;
+
+    if (!bb) {
+      self.activeNode = source;
+    } else {
+      self.activeNode = source.parent
+    }
+
+
+    console.log('up, an', self.activeNode)
 
     //if (source.parent) {
     //  self.levelNodes.push(source.parent)
@@ -294,10 +302,10 @@
 
   }
 
-  _CMTREE.prototype.expand = function(nodeID) {
-    var self = this;
+  _CMTREE.prototype.expand = function(nodeID, bb) {
+    var self = this, n;
 
-    var n;
+    console.log(self.activeNode)
 
     if (self.activeNode && (nodeID == self.activeNode.id)) {
       n = self.activeNode
@@ -310,7 +318,7 @@
       }
     }
 
-    drillNode.call(self, n);
+    drillNode.call(self, n, bb);
 
   };
 
