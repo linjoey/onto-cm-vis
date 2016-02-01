@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Title</title>
 
+    <link rel="stylesheet" href="d3-tip-style.css">
+    <link rel="stylesheet" href="treemap-vis/treemapvis.css">
+
     <style type="text/css">
 
 
@@ -16,7 +19,7 @@
 
         .node text {
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         path.link {
@@ -25,27 +28,46 @@
             stroke-width: 1.5px;
         }
 
+        #treemap-div{
+            float:left;
+            width: 40%;
+        }
+
+        #my-div {
+            float:right;
+            width: 60%;
+        }
+
+        #container {
+            border: 1px solid black;
+            height: 650px;
+        }
+
     </style>
 </head>
 <body>
+<div id="container">
+    <div id="treemap-div"></div>
+    <div id="my-div"></div>
+</div>
 
-<div id="my-div"></div>
 
-<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.min.js"></script>
+<script src="treemap-vis/treemap.js"></script>
 
 <script src="cm-tree.js"></script>
 <script>
 
-
     cm = new CMTree({
         targetID: '#my-div',
         dataFile: 'hpo.json',
-        diameter: 850,
+        diameter: 650,
         keyFn: function(d) {
             return d.id
         },
         labelFn: function(d) {
-            var prefix = 'Abnormality of '
+            var prefix = 'Abnormality of ';
             if (d.name.slice(0, prefix.length) == prefix) {
                 var n = d.name.slice(prefix.length, d.name.length)
                 return n.charAt(0).toUpperCase() + n.slice(1)
@@ -53,9 +75,17 @@
             return d.name;
         },
         tclosure: 'TotalChildren'
-    })
+    });
 
-    cm.draw()
+    cm.draw();
+
+    treemapvis({
+        targetID: '#treemap-div',
+        cb: (function(){
+            var e = cm.expand.bind(cm)
+            return e
+        })()
+    });
 
 
 
