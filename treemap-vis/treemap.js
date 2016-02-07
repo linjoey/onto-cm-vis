@@ -67,7 +67,6 @@
       accumulate(root);
       display(root);
 
-
       function initialize(root) {
         root.x = root.y = 0;
         root.dx = width;

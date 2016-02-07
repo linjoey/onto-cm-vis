@@ -38,7 +38,6 @@
     }
   };
 
-
   _CMTREE.prototype.draw = function(cb) {
     var self = this;
     self.svg = d3.select(self._opts.targetID)
@@ -105,22 +104,22 @@
   function drillNode(d, bb) {
     //console.log('drill',d)
     var self = this;
+    var newArti = false;
 
-    if (d.arti) {
-      self.initData(d)
-    }
 
-    if (d.id == self.data.id) {
+    if (d.id == self.data.id || d.arti) {
+      console.log('init data', d)
       self.initData(d)
     }
 
     //create artificial node
     if (d.depth == 4 && !d.expanded && !d.parent.arti) {
-      var dp = d.parent
+      var dp = d.parent;
+      newArti = true
 
       toggle(dp);
-      dp.arti = true
-      dp.children = [d]
+      dp.arti = true;
+      dp.children = [d];
       d.artiref = dp
     }
 
@@ -130,12 +129,9 @@
       d.artiref = artiref
     }
 
-    if (d.parent && d.parent.arti && d.id == self.activeNode.id) {
+    if (d.parent && d.parent.arti && d.id == self.activeNode.id && !newArti) {
       toggle(d.parent)
     }
-
-    console.log(d)
-    console.log(self.activeNode)
 
     toggle(d);
     update.call(self, d, bb)
@@ -168,7 +164,6 @@
       self.activeNode = source.parent
     }
 
-
     //only show 8
     if (source.children && source.children.length > 8) {
       var fh = source.children.slice(0, 8);
@@ -186,7 +181,25 @@
       source.children = fh
     }
 
-    var dataNodes = self.tree.nodes(self.data)
+    function nodeCircleFactory() {
+      this.append('circle')
+        .attr('r', function(d){
+          return d[self._opts.tclosure] > 0 ? 6 : 1
+        })
+        .style('fill', function(d) {
+          if (d.arti) {
+            return 'red'
+          }
+          return self.nodeColorScale(d[self._opts.tclosure])
+        })
+        .on('click', function(d){
+          drillNode.call(self, d)
+        })
+        .on('mouseover', self.tooltip.show)
+        .on('mouseout', self.tooltip.hide)
+    }
+
+    var dataNodes = self.tree.nodes(self.data);
 
     var n = self.svg.selectAll('g.node').data(dataNodes, self._opts.keyFn);
 
@@ -195,8 +208,33 @@
     }
 
     n.transition().duration(500).attr("transform", transformNode);
-    n.select('circle')
-      .style('fill', function(d) {
+
+    n.each(function(d, i) {
+      var thisSel = d3.select(this);
+
+      if(d.arti) {
+        if(!d.artidrawn) {
+          d.artidrawn = true
+          thisSel.select('circle').remove()
+          thisSel.append('rect')
+            .attr('y', '-7')
+            .style('fill', 'red')
+            .attr('width', 14)
+            .attr('height', 14)
+        }
+
+      } else {
+        d.artidrawn = false
+        var cs = d3.select(this).select('circle');
+        if (cs.empty()) {
+          thisSel.select('rect').remove()
+          nodeCircleFactory.call(thisSel)
+        }
+      }
+    });
+
+
+    n.select('circle').style('fill', function(d) {
         if (d.arti) {
           return 'red'
         }
@@ -215,7 +253,6 @@
         } else {
           return d.name
         }
-
       }
     });
 
@@ -225,25 +262,12 @@
       .attr("transform", transformNode)
 
 
-    ne.append('circle')
-      .attr('r', function(d){
-        return d[self._opts.tclosure] > 0 ? 6 : 1
-      })
-      .style('fill', function(d) {
-        if (d.arti) {
-          return 'red'
-        }
-        return self.nodeColorScale(d[self._opts.tclosure])
-      })
-      .on('click', function(d){
-        drillNode.call(self, d)
-      })
-      .on('mouseover', self.tooltip.show)
-      .on('mouseout', self.tooltip.hide)
+    nodeCircleFactory.call(ne)
 
     ne.append("text")
-      .attr("dy", ".31em")
+      .attr("dy", "0.3em")
       .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+      .attr("dx", function(d) { return d.x < 180 ? "1em" : "-1em"; })
       .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
       .text(function(d){
 
