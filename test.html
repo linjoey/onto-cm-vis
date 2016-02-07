@@ -59,6 +59,29 @@
 <script src="cm-tree.js"></script>
 <script>
 
+    function findFullPathToRoot(node, rootID) {
+
+        var path = '';
+
+        if (path == '') {
+            path = node.name
+        }
+
+        while(node.id !== rootID) {
+            path = node.parent.name + ' &#9679; ' + path;
+            node = node.parent
+        }
+
+        return path
+
+    }
+
+    var path = d3.select('#container')
+            .append('div')
+            .style('left', '450px')
+            .append('p')
+
+
     cm = new CMTree({
         targetID: '#my-div',
         dataFile: 'hpo.json',
@@ -74,7 +97,12 @@
             }
             return d.name;
         },
-        tclosure: 'TotalChildren'
+        tclosure: 'TotalChildren',
+        drillcb: function(d) {
+            var p = findFullPathToRoot(d, 'HP:0000118');
+            console.log('helli ho',d)
+            path.html(p)
+        }
     });
 
     cm.draw();
@@ -85,6 +113,7 @@
             return cm.expand.bind(cm)
         })()
     });
+
 
 
 

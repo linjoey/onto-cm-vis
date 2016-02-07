@@ -18,6 +18,9 @@
       .html(function(d){
         return d.name
       })
+
+    this.dispatch = d3.dispatch('ondrill')
+    this.dispatch.on('ondrill', options.drillcb)
   };
 
   _CMTREE.prototype.initData = function(d) {
@@ -43,7 +46,7 @@
     self.svg = d3.select(self._opts.targetID)
       .append('svg')
       .attr('width', self._opts.diameter)
-      .attr('height', self._opts.diameter)
+      .attr('height', self._opts.diameter - 60)
       .append('g')
       .attr("transform", "translate(" + self._opts.diameter / 2 + "," + self._opts.diameter / 2 + ")");
 
@@ -105,6 +108,8 @@
     //console.log('drill',d)
     var self = this;
     var newArti = false;
+
+    self.dispatch.ondrill(d);
 
 
     if (d.id == self.data.id || d.arti) {
@@ -199,6 +204,12 @@
         .on('mouseout', self.tooltip.hide)
     }
 
+    function nodeTriangleFactory() {
+      this.append('polygon')
+        .attr('points', '20,2 30,2 25,10')
+        .style('fill', 'steelblue')
+    }
+
     var dataNodes = self.tree.nodes(self.data);
 
     var n = self.svg.selectAll('g.node').data(dataNodes, self._opts.keyFn);
@@ -263,6 +274,7 @@
 
 
     nodeCircleFactory.call(ne)
+    //nodeTriangleFactory.call(ne)
 
     ne.append("text")
       .attr("dy", "0.3em")
