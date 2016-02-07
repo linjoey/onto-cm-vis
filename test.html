@@ -43,6 +43,14 @@
             height: 650px;
         }
 
+        #path-div {
+            padding-top: 5px;
+            padding-left: 20px;
+            height: 40px;
+            border: 1px solid steelblue;
+
+        }
+
     </style>
 </head>
 <body>
@@ -60,26 +68,18 @@
 <script>
 
     function findFullPathToRoot(node, rootID) {
-
-        var path = '';
-
-        if (path == '') {
-            path = node.name
-        }
-
+        var path = node.name;
         while(node.id !== rootID) {
-            path = node.parent.name + ' &#9679; ' + path;
+            path = node.parent.name + ' / ' + path;
             node = node.parent
         }
-
         return path
-
     }
 
-    var path = d3.select('#container')
+    var path = d3.select('#my-div')
             .append('div')
-            .style('left', '450px')
-            .append('p')
+            .attr('id', 'path-div')
+            .html('Phenotypic abnormality')
 
 
     cm = new CMTree({
@@ -100,7 +100,6 @@
         tclosure: 'TotalChildren',
         drillcb: function(d) {
             var p = findFullPathToRoot(d, 'HP:0000118');
-            console.log('helli ho',d)
             path.html(p)
         }
     });
