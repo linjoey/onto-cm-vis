@@ -42,6 +42,13 @@
             border: 1px solid black;
             height: 650px;
         }
+        #path-div {
+            padding-top: 5px;
+            padding-left: 20px;
+            height: 40px;
+            border: 1px solid steelblue;
+
+        }
 
     </style>
 </head>
@@ -59,6 +66,22 @@
 <script src="cm-tree.js"></script>
 <script>
 
+
+    function findFullPathToRoot(node, rootID) {
+        var path = node.name;
+        while(node.id !== rootID) {
+            path = node.parent.name + ' / ' + path;
+            node = node.parent
+        }
+        return path
+    }
+
+    var path = d3.select('#my-div')
+            .append('div')
+            .attr('id', 'path-div')
+            .html('Phenotypic abnormality')
+
+
     cm = new CMTree({
         targetID: '#my-div',
         dataFile: 'hpo.json',
@@ -74,7 +97,11 @@
             }
             return d.name;
         },
-        tclosure: 'TotalChildren'
+        tclosure: 'TotalChildren',
+        drillcb: function(d) {
+            var p = findFullPathToRoot(d, 'HP:0000118');
+            path.html(p)
+        }
     });
 
     cm.draw();
@@ -82,10 +109,10 @@
     treemapvis({
         targetID: '#treemap-div',
         cb: (function(){
-            var e = cm.expand.bind(cm)
-            return e
+            return cm.expand.bind(cm)
         })()
     });
+
 
 
 
